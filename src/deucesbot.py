@@ -465,7 +465,7 @@ async def sendHand(ch,i):
         msg += "\n```"
     else:
         msg += "None\n```"
-    await client.send_message(C[ch]["players"][i], msg)
+    await C[ch]["players"][i].send(msg)
 
 @client.event
 async def displayMid(ch):
@@ -488,7 +488,7 @@ async def displayMid(ch):
         msg += "|__"*len(C[ch]["mid"]) + "__|\n```"
     else:
         msg += "None\n```"
-    await client.send_message(ch, msg)
+    await ch.send(msg)
     
     if C[ch]["players"][C[ch]["pov"]] == client.user:
         curr = C[ch]["pov"]
@@ -503,7 +503,7 @@ async def displayWinners(ch):
     for i in range(C[ch]["nPlayers"]-1):
         msg += ['\U0001F947','\U0001F948','\U0001F949'][i] + ' ' + C[ch]["players"][C[ch]["winners"][i]].name + '\n'
     msg += "Use `d!start` to start another game!"
-    await client.send_message(ch, msg)
+    await ch.send(msg)
     with open("winners.txt", 'a') as fa:
         fa.write(C[ch]["players"][C[ch]["winners"][0]].id)
     with open("players.txt", 'a') as fa:
@@ -530,7 +530,7 @@ async def displayProfile(ch, p):
     msg = "__**" + p.name + "'s Profile:**__\n"
     msg += "You have " + w + " wins in " + g + " games.\n"
     msg += "You have played " + si + " singles, " + d + " doubles, " + t + " triples, " + st + " straights, " + fl + " flushes, " + fh + " full houses, " + sf + " straight flushes, and " + b + " bombs."
-    await client.send_message(ch, msg)
+    await ch.send(msg)
 
 @client.event
 async def on_ready():
@@ -559,18 +559,18 @@ async def on_message(message):
     
     if not C[ch]["started"]:
         if msg == "d!help":
-            await client.send_message(ch, "Use `d!start` to start a game of deuces, or `d!cancel` to cancel an existing one.\nUse `d!prof` or `d!profile` to access your profile.\nUse `d!addbot` to add a bot to your game, and use `d!rmbot` or `d!removebot` to remove one.")
+            await ch.send("Use `d!start` to start a game of deuces, or `d!cancel` to cancel an existing one.\nUse `d!prof` or `d!profile` to access your profile.\nUse `d!addbot` to add a bot to your game, and use `d!rmbot` or `d!removebot` to remove one.")
         elif msg == "d!profile" or msg == "d!prof":
             await displayProfile(ch, au)
         elif msg == "d!start":
             if not C[ch]["playerMenu"]:
                 C[ch]["playerMenu"] = True
                 C[ch]["players"].append(au)
-                await client.send_message(ch, "Use `d!join` to join (and `d!leave` if you have to go)! Once everyone has joined, type `d!start` again to begin.")
+                await ch.send("Use `d!join` to join (and `d!leave` if you have to go)! Once everyone has joined, type `d!start` again to begin.")
                 output = str(len(C[ch]["players"])) + "/4 Players:"
                 for usr in C[ch]["players"]:
                     output += ' ' + usr.mention
-                await client.send_message(ch, output)
+                await ch.send(output)
             elif 1 < len(C[ch]["players"]) < 5:
                 C[ch]["playerMenu"] = False
                 C[ch]["nPlayers"] = len(C[ch]["players"])
@@ -579,7 +579,7 @@ async def on_message(message):
         elif msg == "d!cancel":
             C[ch]["playerMenu"] = False
             C[ch]["players"] = []
-            await client.send_message(ch, "Game cancelled!")
+            await ch.send("Game cancelled!")
         
         if C[ch]["playerMenu"]:
             curr = len(C[ch]["players"])
@@ -598,10 +598,10 @@ async def on_message(message):
                 output = str(len(C[ch]["players"])) + "/4 Players:"
                 for usr in C[ch]["players"]:
                     output += ' ' + usr.mention
-                await client.send_message(ch, output)
+                await ch.send(output)
     else:
         if msg == "d!help":
-            await client.send_message(ch, "If it's your turn, type the cards you want to play (e.g. `3D3H` for 3\U00002666 3\U00002665) or type `pass` to pass.\nUse `d!display` to re-display the current hand, and use `d!leave` or `d!forfeit` to leave an ongoing game.")
+            await ch.send("If it's your turn, type the cards you want to play (e.g. `3D3H` for 3\U00002666 3\U00002665) or type `pass` to pass.\nUse `d!display` to re-display the current hand, and use `d!leave` or `d!forfeit` to leave an ongoing game.")
         elif msg == "d!profile" or msg == "d!prof":
             await displayProfile(ch, au)
         if au in C[ch]["players"]:
@@ -622,6 +622,6 @@ async def on_message(message):
                         reset(ch)
             elif msg == "d!reset":
                 reset(ch)
-                await client.send_message(ch, "Game reset!")
+                await ch.send("Game reset!")
             
 client.run('INSERT TOKEN HERE')
